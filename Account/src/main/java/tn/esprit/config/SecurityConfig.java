@@ -46,19 +46,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http.csrf().disable();
 		http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.authorizeRequests().antMatchers("/topic/notification",
-				"/runtime.js", "/scripts.js", "/styles.js", "/polyfills.js", "/assets/**",
-				"/glyphicons-halflings-regular.woff2", "/glyphicons-halflings-regular.woff",
-				"/materialdesignicons-webfont.woff2", "/glyphicons-halflings-regular.ttf", "/vendor.js", "/main.js",
-				"/login", "/index.html", "/fontawesome-webfont.woff", "/js/**", "/img/**", "/css/**", "/static/img/**",
-				"static/**", "/accounts/login","/accounts/register","/accounts/updateActive","/accounts/**", "/fontawesome-webfont.ttf", "/fontawesome-webfont.woff2").permitAll();
-		http.authorizeRequests()
-				.antMatchers("/static/img/**", "/api/account/reset_password/init/**",
-						"/api/account/reset_password/finish/**", "/api/startProcess", "/api/confirmation/**",
-						"/websocket/Systemalerte/**", "/api/annulation/**", "/login", "/index.html", "/js/**",
-						"/img/**", "/css/**", "/ws/**")
-				.permitAll();
-		http.authorizeRequests().anyRequest().authenticated();
+//		http.authorizeRequests().antMatchers("/topic/notification",
+//				"/runtime.js", "/scripts.js", "/styles.js", "/polyfills.js", "/assets/**",
+//				"/glyphicons-halflings-regular.woff2", "/glyphicons-halflings-regular.woff",
+//				"/materialdesignicons-webfont.woff2", "/glyphicons-halflings-regular.ttf", "/vendor.js", "/main.js",
+//				"/login", "/index.html", "/fontawesome-webfont.woff", "/js/**", "/img/**", "/css/**", "/static/img/**",
+//				"static/**", "/accounts/login","/accounts/register","/accounts/updateActive","/accounts/**", "/fontawesome-webfont.ttf", "/fontawesome-webfont.woff2").permitAll();
+//		http.authorizeRequests()
+//				.antMatchers("/static/img/**", "/api/account/reset_password/init/**",
+//						"/api/account/reset_password/finish/**", "/api/startProcess", "/api/confirmation/**",
+//						"/websocket/Systemalerte/**", "/api/annulation/**", "/login", "/index.html", "/js/**",
+//						"/img/**", "/css/**", "/ws/**")
+//				.permitAll();
+        http.authorizeRequests().anyRequest().permitAll();
+//		http.authorizeRequests().anyRequest().authenticated();
 //		http.addFilter(new JWTAuthentificationFilter(authenticationManager()));
 		http.addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 

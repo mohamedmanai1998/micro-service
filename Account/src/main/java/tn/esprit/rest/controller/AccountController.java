@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import tn.esprit.config.JWTAuthorizationFilter;
+//import tn.esprit.config.JWTAuthorizationFilter;
 import tn.esprit.exceptions.BadRequestException;
 import tn.esprit.model.Account;
 import tn.esprit.model.dto.*;
@@ -31,14 +31,14 @@ public class AccountController {
 	@Autowired
 	private AccountService accountService;
 	
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	@Autowired
-	private SecurityService securityService;
+//	@Autowired
+//	private AuthenticationManager authenticationManager;
+//
+//	@Autowired
+//	private PasswordEncoder passwordEncoder;
+//
+//	@Autowired
+//	private SecurityService securityService;
 	
 	@Autowired
 	private AccountRepository accountRepository;
@@ -46,7 +46,7 @@ public class AccountController {
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody AccountCreationDto accountDto) {
 		accountService.register(accountDto);
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok("le compte est bien cree !!");
 	}
 	
 //	@GetMapping("/all")
@@ -56,26 +56,26 @@ public class AccountController {
 //	}
 	
 	@PostMapping(value = "/login")
-	public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest){
-		System.out.println(passwordEncoder.encode("SuperAdmin"));
+	public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequest){
+//		System.out.println(passwordEncoder.encode("SuperAdmin"));
 		if(StringUtils.isEmpty(loginRequest.getUsername()) || StringUtils.isEmpty(loginRequest.getPassword())) {
 			throw new BadRequestException("MISSING_USERNAME_OR_PASSWORD", "");
 		}
 		Account account= accountRepository.findByUsernameIgnoreCase(loginRequest.getUsername()).get();
-		if(!passwordEncoder.matches(loginRequest.getPassword(), account.getPassword())) {
-			throw new BadRequestException("PASSWORD_INCORRECT", "");
-		}
-		Authentication authentication = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-		User userPrincipal = (User) authentication.getPrincipal();
+//		if(!passwordEncoder.matches(loginRequest.getPassword(), account.getPassword())) {
+//			throw new BadRequestException("PASSWORD_INCORRECT", "");
+//		}
+//		Authentication authentication = authenticationManager.authenticate(
+//				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+//		User userPrincipal = (User) authentication.getPrincipal();
 		
-		Account currentUser = accountRepository.findByUsernameIgnoreCase(loginRequest.getUsername()).get();
-		String jwt = Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
-				.setExpiration(new Date(System.currentTimeMillis() + JWTAuthorizationFilter.EXPIRATION_TIME))
-				.signWith(SignatureAlgorithm.HS256, JWTAuthorizationFilter.SECRET)
-				.claim("roles", userPrincipal.getAuthorities()).claim("name", currentUser.getUsername())
-				.compact();
-		return ResponseEntity.ok(new LoginResponseDto(jwt));
+//		Account currentUser = accountRepository.findByUsernameIgnoreCase(loginRequest.getUsername()).get();
+//		String jwt = Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
+//				.setExpiration(new Date(System.currentTimeMillis() + JWTAuthorizationFilter.EXPIRATION_TIME))
+//				.signWith(SignatureAlgorithm.HS256, JWTAuthorizationFilter.SECRET)
+//				.claim("roles", userPrincipal.getAuthorities()).claim("name", currentUser.getUsername())
+//				.compact();
+		return ResponseEntity.ok("Vous etes connecte(e) :) !!");
 	}
 	@PutMapping(value ="/updateActive")
 	public ResponseEntity<Account> updateActive(@RequestBody ValidationCodeAccountDto verificationCode){
@@ -85,7 +85,7 @@ public class AccountController {
 	
 	@GetMapping
 	public ResponseEntity<Account> getCurrentUser(){
-		return ResponseEntity.ok(securityService.getCurrentUser());
+		return ResponseEntity.ok(null);
 		
 	}
 	@GetMapping("/{id}")

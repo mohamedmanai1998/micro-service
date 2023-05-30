@@ -1,84 +1,59 @@
-comptedb:
-  image: mysql:latest
-  volumes:
-    -  /home/user/Desktop/gest-compte-bancaires:/var/lib/mysql
-  ports:
-    - "3306:3306"
-  environment:
-    MYSQL_ROOT_PASSWORD: password
-    MYSQL_DATABASE: gest-compte-bancaires
-
-version: '3.8'
-
+version: "3.8"
 services:
-  discovery:
-    image: openjdk:11-jre-slim
-    command: ["java", "-jar", "/app/discovery.jar"]
-    depends_on:
-      - db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/gest-compte-bancaires?useSSL=false&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: my-secret-pw
+  eurekaserver:
+    container_name: eurekaserver
+    image: eureka:latest
     ports:
       - "8762:8762"
-    volumes:
-      - ./discovery/target:/app
-  gateway:
-    image: openjdk:11-jre-slim
-    command: ["java", "-jar", "/app/gateway.jar"]
-    depends_on:
-      - discovery
-      - customer-service
-      - order-service
-      - nodejs-service
-    environment:
-      DISCOVERY_SERVER_URL: http://discovery:8761/eureka/
+    networks:
+      - eureka-server
+
+  account:
+    image: account:latest
     ports:
-      - "8080:8080"
-    volumes:
-      - ./gateway/target:/app
-  customer-service:
-    image: openjdk:11-jre-slim
-    command: ["java", "-jar", "/app/customer-service.jar"]
-    depends_on:
-      - db
+      - "8083:8083"
+    networks:
+      - eureka-server
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/my_db?useSSL=false&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: my-secret-pw
-      SERVER_PORT: 8081
-    volumes:
-      - ./customer-service/target:/app
-  order-service:
-    image: openjdk:11-jre-slim
-    command: ["java", "-jar", "/app/order-service.jar"]
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8762/eureka/
     depends_on:
-      - db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/my_db?useSSL=false&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: my-secret-pw
-      SERVER_PORT: 8082
-    volumes:
-      - ./order-service/target:/app
-  nodejs-service:
-    build: ./nodejs-service
-    depends_on:
-      - gateway
-    ports:
-      - "3000:3000"
+      - eurekaserver
+
   db:
     image: mysql:latest
     command: --default-authentication-plugin=mysql_native_password
     restart: always
+    ports:
+      - "3306:3306"
+    networks:
+      - mysql
     environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: my_db
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE: account
     volumes:
       - mysql-data:/var/lib/mysql
 
+  gateway:
+    image: openjdk:11-jre-slim
+    command: [ "java", "-jar", "/app/CompteService-0.0.1-SNAPSHOT.jar" ]
+    depends_on:
+      - account
+      - eurekaserver
+    networks:
+      - eureka-server
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8762/eureka/
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./gateway/target:/app
+
 volumes:
   mysql-data:
+networks:
+  eureka-server:
+    external: true
+  mysql:
+    driver: bridge
 
 

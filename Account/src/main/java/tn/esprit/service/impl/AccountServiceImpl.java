@@ -80,15 +80,6 @@ public class AccountServiceImpl implements AccountService {
 			throw new BadRequestException(ErrorCode.PASSWORD_NOT_EQ_CONFIRM_PASSWORD, "");
 		}
 
-		Optional<Account> testAccount = accountRepository.findByEmailIgnoreCase(accountDto.getEmail());
-		if (!testAccount.isEmpty()) {
-			throw new BadRequestException(ErrorCode.DUPLICATED_EMAIL, "");
-		}
-
-		testAccount = accountRepository.findByUsernameIgnoreCase(accountDto.getUsername());
-		if (!testAccount.isEmpty()) {
-			throw new BadRequestException(ErrorCode.DUPLICATED_USERNAME, "");
-		}
 
 		Account account = new Account();
 		account.setEmail(accountDto.getEmail());
@@ -102,12 +93,12 @@ public class AccountServiceImpl implements AccountService {
 		account.setVerificationCode(verificationCode);
 		account.setVerificationCodeExpiration(verificationCodeExpiration);
 
-		Optional<Role> memberRole = roleRepository.findById(2L);
-		if (!memberRole.isEmpty()) {
-			Set<Role> roles = new HashSet<Role>();
-			roles.add(memberRole.get());
-			account.setRoles(roles);
-		}
+//		Optional<Role> memberRole = roleRepository.findById(2L);
+//		if (!memberRole.isEmpty()) {
+//			Set<Role> roles = new HashSet<Role>();
+//			roles.add(memberRole.get());
+//			account.setRoles(roles);
+//		}
 
 		accountRepository.save(account);
 
@@ -117,9 +108,9 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public List<Account> getAllAccounts() {
 		List<Account> accounts = accountRepository.findAll();
-		if (accounts.isEmpty()) {
-			throw new BadRequestException("There is not an account", "");
-		}
+		//if (accounts.isEmpty()) {
+		//	throw new BadRequestException("There is not an account", "");
+		//}
 		return accounts;
 	}
 
