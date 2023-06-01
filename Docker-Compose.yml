@@ -48,6 +48,18 @@ services:
     volumes:
       - ./gateway/target:/app
 
+  configserver:
+    image: configserver:latest
+    ports:
+      - "8888:8888"
+    networks:
+      - eureka-server
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://eurekaserver:8762/eureka/
+    depends_on:
+      - eurekaserver
+    restart: on-failure
+
 volumes:
   mysql-data:
 networks:
